@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated Communication Framework</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script>
+        let currentUser = null;
+        let ws = null;
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = username;
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    initWebSocket();
+                } else {
+                    alert('Login failed. Please try again.');
+                }
+            });
+        }
+
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = null;
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('mainContent').style.display = 'none';
+                    if (ws) {
+                        ws.close();
+                        ws = null;
+                    }
+                }
+            });
+        }
+
+        function initWebSocket() {
+            ws = new WebSocket(`ws://${location.host}/ws`);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                refreshEmails();
+                refreshChats();
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'email') {
+                    displayEmails(data.emails);
+                } else if (data.type === 'chat') {
+                    displayChats(data.messages);
+                }
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+            };
+        }
+
+        function refreshEmails() {
+            ws.send(JSON.stringify({ type: 'email' }));
+        }
+
+        function refreshChats() {
+            const recipient = document.getElementById('chatRecipient').value;
+            ws.send(JSON.stringify({ type: 'chat', recipient }));
+        }
+
+        function sendEmail() {
+            const recipient = document.getElementById('emailRecipient').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+
+            fetch('/send_email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipient, subject, body })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Email sent successfully!');
+                    refreshEmails();
+                } else {
+                    alert('Failed to send email. Please try again.');
+                }
+            });
+        }
+
+        function sendChat() {
+            const recipient = document.getElementById('chatRecipient').value;
+            const message = document.getElementById('chatMessage').value;
+
+            fetch('/send_chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipient, message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('chatMessage').value = '';
+                    refreshChats();
+                } else {
+                    alert('Failed to send message. Please try again.');
+                }
+            });
+        }
+
+        function displayEmails(emails) {
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+            emails.forEach(email => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${email.subject}</strong> (${email.sender})
+                    <br>${email.body}
+                    <br><small>${moment(email.timestamp).fromNow()}</small>
+                `;
+                emailList.appendChild(li);
+            });
+        }
+
+        function displayChats(messages) {
+            const chatList = document.getElementById('chatList');
+            chatList.innerHTML = '';
+            messages.forEach(msg => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${msg.sender}</strong>: ${msg.message}
+                    <br><small>${moment(msg.timestamp).fromNow()}</small>
+                `;
+                chatList.appendChild(li);
+            });
+            chatList.scrollTop = chatList.scrollHeight;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(tabName).style.display = 'block';
+            if (tabName === 'emailTab') {
+                refreshEmails();
+            } else if (tabName === 'chatTab') {
+                refreshChats();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <button onclick="logout()">Logout</button>
+        <div class="tabs">
+            <button onclick="switchTab('emailTab')">Email</button>
+            <button onclick="switchTab('chatTab')">Chat</button>
+        </div>
+
+        <div id="emailTab" class="tab-content">
+            <h2>Email Service</h2>
+            <div>
+                <input type="text" id="emailRecipient" placeholder="Recipient">
+                <input type="text" id="emailSubject" placeholder="Subject">
+                <textarea id="emailBody" placeholder="Message"></textarea>
+                <button onclick="sendEmail()">Send Email</button>
+            </div>
+            <h3>Inbox</h3>
+            <ul id="emailList"></ul>
+        </div>
+
+        <div id="chatTab" class="tab-content" style="display: none;">
+            <h2>Chat Service</h2>
+            <div>
+                <input type="text" id="chatRecipient" placeholder="Recipient">
+                <input type="text" id="chatMessage" placeholder="Message">
+                <button onclick="sendChat()">Send Message</button>
+            </div>
+            <ul id="chatList"></ul>
+        </div>
+    </div>
+</body>
+</html>
