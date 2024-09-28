@@ -4,12 +4,15 @@ import os
 import json
 import asyncio
 import aiohttp
+import aiosqlite
 from aiohttp import web
 from aiohttp_session import setup, get_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from email_service.email_manager import EmailManager
 from chat_service.chat_manager import ChatManager
 from config.settings import SECRET_KEY, USERS, WEBSOCKET_HOST, WEBSOCKET_PORT
+
+DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///integrated_communication.db')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 email_manager = EmailManager()
