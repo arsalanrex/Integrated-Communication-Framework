@@ -1,4 +1,4 @@
-# smtp_server.py
+# smpt_server.py
 
 import asyncio
 from aiosmtpd.controller import Controller

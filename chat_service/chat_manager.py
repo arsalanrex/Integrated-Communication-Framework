@@ -2,7 +2,6 @@
 
 from config.settings import USERS
 from chat_service.chat_storage import ChatStorage
-import asyncio
 
 chat_storage = ChatStorage()
 
@@ -20,7 +19,8 @@ class ChatManager:
             return False
 
     async def get_messages(self, user1, user2):
-        return await chat_storage.get_messages(user1, user2)
+        messages = await chat_storage.get_messages(user1, user2)
+        return sorted(messages, key=lambda x: x['timestamp'])
 
     async def mark_as_read(self, user, message_id):
         return await chat_storage.mark_as_read(user, message_id)

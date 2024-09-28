@@ -1,0 +1,12 @@
+{
+    "user1": {
+        "email": "user1@example.com",
+        "password": "password1",
+        "mobile": "+1234567890"
+    },
+    "user2": {
+        "email": "user2@example.com",
+        "password": "password2",
+        "mobile": "+0987654321"
+    }
+}

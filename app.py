@@ -1,18 +1,14 @@
-# integrated_communication/app.py
-
 import os
 import json
 import asyncio
+import traceback
 import aiohttp
-import aiosqlite
 from aiohttp import web
 from aiohttp_session import setup, get_session
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from email_service.email_manager import EmailManager
 from chat_service.chat_manager import ChatManager
-from config.settings import SECRET_KEY, USERS, WEBSOCKET_HOST, WEBSOCKET_PORT
-
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///integrated_communication.db')
+from config.settings import SECRET_KEY, USERS, WEBSOCKET_HOST, WEBSOCKET_PORT, DATABASE_URI
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 email_manager = EmailManager()
@@ -54,8 +50,16 @@ async def send_email(request):
     recipient = data.get('recipient')
     subject = data.get('subject')
     body = data.get('body')
-    success = await email_manager.send_email(sender, recipient, subject, body)
-    return web.json_response({'success': success})
+    try:
+        success = await email_manager.send_email(sender, recipient, subject, body)
+        if success:
+            return web.json_response({'success': True})
+        else:
+            return web.json_response({'success': False, 'error': 'Failed to send email'})
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        print(traceback.format_exc())
+        return web.json_response({'success': False, 'error': str(e)})
 
 async def get_emails(request):
     session = await get_session(request)
@@ -102,7 +106,7 @@ async def websocket_handler(request):
                 emails = await email_manager.get_emails(user)
                 await ws.send_json({'type': 'email', 'emails': emails})
             elif data['type'] == 'chat':
-                messages = await chat_manager.get_messages(user, data['recipient'])
+                messages = await chat_manager.get_messages(user, data.get('recipient'))
                 await ws.send_json({'type': 'chat', 'messages': messages})
         elif msg.type == aiohttp.WSMsgType.ERROR:
             print(f'WebSocket connection closed with exception {ws.exception()}')

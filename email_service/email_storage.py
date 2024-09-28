@@ -1,7 +1,6 @@
 # email_service/email_storage.py
 
 import aiosqlite
-import json
 from config.settings import DATABASE_URI
 
 class EmailStorage:

@@ -25,6 +25,7 @@
                     currentUser = username;
                     document.getElementById('loginForm').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
+                    document.getElementById('currentUser').textContent = username;
                     initWebSocket();
                 } else {
                     alert('Login failed. Please try again.');
@@ -140,8 +141,10 @@
             chatList.innerHTML = '';
             messages.forEach(msg => {
                 const li = document.createElement('li');
+                const isCurrentUser = msg.sender === currentUser;
+                li.className = isCurrentUser ? 'sent' : 'received';
                 li.innerHTML = `
-                    <strong>${msg.sender}</strong>: ${msg.message}
+                    <strong>${isCurrentUser ? 'You' : msg.sender}</strong>: ${msg.message}
                     <br><small>${moment(msg.timestamp).fromNow()}</small>
                 `;
                 chatList.appendChild(li);
@@ -171,6 +174,7 @@
     </div>
 
     <div id="mainContent" style="display: none;">
+        <div id="userInfo">Logged in as: <span id="currentUser"></span></div>
         <button onclick="logout()">Logout</button>
         <div class="tabs">
             <button onclick="switchTab('emailTab')">Email</button>
