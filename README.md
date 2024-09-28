@@ -158,7 +158,7 @@ integrated-communication-framework/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/arsalanrex/Integrated-Communication-Framework/blob/main/LICENCE) file for details.
 
 The MIT License is a permissive license that is short and to the point. It lets people do almost anything they want with your project, like making and distributing closed source versions, as long as they include the original copyright and license notice.
 
