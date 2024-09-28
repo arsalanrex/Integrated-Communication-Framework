@@ -49,9 +49,26 @@
             });
         }
 
+        function refreshEmails() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'email' }));
+            } else {
+                console.error('WebSocket is not connected');
+            }
+        }
+
+        function refreshChats() {
+            const recipient = document.getElementById('chatRecipient').value;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'chat', recipient }));
+            } else {
+                console.error('WebSocket is not connected');
+            }
+        }
+
         function initWebSocket() {
             ws = new WebSocket(`ws://${location.host}/ws`);
-            
+
             ws.onopen = () => {
                 console.log('WebSocket connected');
                 refreshEmails();
@@ -190,18 +207,23 @@
                 <button onclick="sendEmail()">Send Email</button>
             </div>
             <h3>Inbox</h3>
+            <button onclick="refreshEmails()">Refresh Emails</button>
             <ul id="emailList"></ul>
         </div>
 
         <div id="chatTab" class="tab-content" style="display: none;">
             <h2>Chat Service</h2>
-            <div>
-                <input type="text" id="chatRecipient" placeholder="Recipient">
-                <input type="text" id="chatMessage" placeholder="Message">
-                <button onclick="sendChat()">Send Message</button>
+            <div class="chat-controls">
+                <input type="text" id="chatRecipient" placeholder="Recipient" class="chat-input">
+            </div>
+            <input type="text" id="chatMessage" placeholder="Message" class="chat-input">
+            <div class="chat-buttons">
+                <button class="send-button" onclick="sendChat()">Send Message</button>
+                <button class="receive-button" onclick="refreshChats()">Refresh Chats</button>
             </div>
             <ul id="chatList"></ul>
         </div>
     </div>
+    <script src="/static/script.js"></script>
 </body>
 </html>
