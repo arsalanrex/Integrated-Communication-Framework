@@ -1,4 +1,4 @@
-# integrated_communication/chat_service/chat_storage.py
+# chat_service/chat_storage.py
 
 import aiosqlite
 from config.settings import DATABASE_URI

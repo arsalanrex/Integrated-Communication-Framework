@@ -1,4 +1,4 @@
-# integrated_communication/chat_service/chat_manager.py
+# chat_service/chat_manager.py
 
 from config.settings import USERS
 from chat_service.chat_storage import ChatStorage

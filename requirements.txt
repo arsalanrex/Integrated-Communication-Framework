@@ -3,3 +3,4 @@ aiohttp-session==2.9.0
 aiosqlite==0.17.0
 python-dotenv==0.19.0
 cryptography==3.4.7
+aiosmtpd==1.4.6

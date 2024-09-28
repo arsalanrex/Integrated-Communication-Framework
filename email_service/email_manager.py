@@ -1,4 +1,4 @@
-# integrated_communication/email_service/email_manager.py
+# email_service/email_manager.py
 
 import smtplib
 from email.mime.text import MIMEText

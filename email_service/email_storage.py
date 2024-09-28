@@ -1,4 +1,4 @@
-# integrated_communication/email_service/email_storage.py
+# email_service/email_storage.py
 
 import aiosqlite
 import json
