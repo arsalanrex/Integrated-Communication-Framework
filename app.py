@@ -77,16 +77,16 @@ async def send_chat(request):
         return web.json_response({'success': False, 'error': 'Not authenticated'})
     recipient = data.get('recipient')
     message = data.get('message')
-    success = await chat_manager.send_message(sender, recipient, message)
+    success = await chat_manager.send_message(USERS[sender]['mobile'], recipient, message)
     return web.json_response({'success': success})
 
 async def get_chats(request):
     session = await get_session(request)
-    user1 = session.get('user')
+    user = session.get('user')
     if not user1:
         return web.json_response({'success': False, 'error': 'Not authenticated'})
-    user2 = request.query.get('user')
-    messages = await chat_manager.get_messages(user1, user2)
+    #user2 = request.query.get('user')
+    messages = await chat_manager.get_messages(USERS[user]['mobile'])
     return web.json_response({'success': True, 'messages': messages})
 
 async def websocket_handler(request):
@@ -106,7 +106,7 @@ async def websocket_handler(request):
                 emails = await email_manager.get_emails(user)
                 await ws.send_json({'type': 'email', 'emails': emails})
             elif data['type'] == 'chat':
-                messages = await chat_manager.get_messages(user, data.get('recipient'))
+                messages = await chat_manager.get_messages(data.get('recipient'))
                 await ws.send_json({'type': 'chat', 'messages': messages})
         elif msg.type == aiohttp.WSMsgType.ERROR:
             print(f'WebSocket connection closed with exception {ws.exception()}')

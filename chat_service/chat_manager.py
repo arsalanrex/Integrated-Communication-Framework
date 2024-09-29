@@ -18,8 +18,8 @@ class ChatManager:
             print(f"Failed to send message: {e}")
             return False
 
-    async def get_messages(self, user1, user2):
-        messages = await chat_storage.get_messages(user1, user2)
+    async def get_messages(self, user):
+        messages = await chat_storage.get_messages(user)
         return sorted(messages, key=lambda x: x['timestamp'])
 
     async def mark_as_read(self, user, message_id):

@@ -12,14 +12,14 @@ class ChatStorage:
             ''', (sender, recipient, message, False))
             await db.commit()
 
-    async def get_messages(self, user1, user2):
+    async def get_messages(self, user):
         async with aiosqlite.connect(DATABASE_URI) as db:
             async with db.execute('''
                 SELECT id, sender, recipient, message, read, timestamp
                 FROM chat_messages
-                WHERE (sender = ? AND recipient = ?) OR (sender = ? AND recipient = ?)
+                WHERE sender = ? OR recipient = ?
                 ORDER BY timestamp ASC
-            ''', (user1, user2, user2, user1)) as cursor:
+            ''', (user, user,)) as cursor:
                 messages = await cursor.fetchall()
                 return [
                     {

@@ -1,7 +1,7 @@
 # email_service/email_storage.py
 
 import aiosqlite
-from config.settings import DATABASE_URI
+from config.settings import DATABASE_URI, USERS
 
 class EmailStorage:
     async def store_email(self, sender, recipient, subject, body):
@@ -17,9 +17,9 @@ class EmailStorage:
             async with db.execute('''
                 SELECT id, sender, subject, body, read, timestamp
                 FROM emails
-                WHERE recipient = ?
+                WHERE recipient IN (?, ?)
                 ORDER BY timestamp DESC
-            ''', (user,)) as cursor:
+            ''', (user, USERS[user]['email'])) as cursor:
                 emails = await cursor.fetchall()
                 return [
                     {
