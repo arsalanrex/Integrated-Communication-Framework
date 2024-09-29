@@ -67,23 +67,39 @@ The Integrated Communication Framework is a comprehensive solution that combines
    WEBSOCKET_PORT=8080
    ```
 
+## Running the Application
 
-5. Initialize the database:
+### Locally
+
+- To run the application locally, use the following command:
+
+1. Initialize the database:
    ```
    python init_db.py
    ```
 
-6. Start the SMTP server:
+2. Start the SMTP server:
    ```
    python smtp_server.py
    ```
 
-7. Run the application:
+3. Run the application:
    ```
    python app.py
    ```
 
-8. Open a web browser and navigate to `http://localhost:8081` (or the port specified in your configuration).
+4. Open a web browser and navigate to `http://localhost:8080` (or the port specified in your configuration).
+
+### Docker
+
+- To run the application using Docker, build the image and run the container:
+
+  ```
+  docker-compose build
+  docker-compose up
+  
+  > log in to localhost:8080
+  ```
 
 ## Project Structure
 
