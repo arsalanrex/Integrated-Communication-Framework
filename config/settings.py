@@ -3,6 +3,7 @@
 import os
 from dotenv import load_dotenv
 import secrets
+import base64
 from users import USERS
 
 load_dotenv()
@@ -20,7 +21,16 @@ DATABASE_URI = os.getenv('DATABASE_URI', 'integrated_communication.db')
 # Generate a proper SECRET_KEY if not provided
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
-    SECRET_KEY = secrets.token_bytes(32)
+    # Generate a random 32-byte key and encode it to base64
+    SECRET_KEY = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode()
+else:
+    # Ensure the provided key is in the correct format
+    try:
+        # Try to decode the key to check if it's valid base64
+        base64.urlsafe_b64decode(SECRET_KEY)
+    except:
+        # If it's not valid base64, encode it
+        SECRET_KEY = base64.urlsafe_b64encode(SECRET_KEY.encode()).decode()
 
 # WebSocket settings
 WEBSOCKET_HOST = os.getenv('WEBSOCKET_HOST', 'localhost')
