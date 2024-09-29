@@ -20,6 +20,7 @@ The Integrated Communication Framework is a comprehensive solution that combines
 - **WebSocket Integration**: Real-time updates for both email and chat services.
 - **Database Integration**: Persistent storage of emails and chat messages using SQLite.
 - **SMTP Server**: Custom SMTP server for handling email operations.
+- **Docker Support**: Containerized deployment for easy setup and scalability.
 
 ## Technology Stack
 
@@ -31,6 +32,7 @@ The Integrated Communication Framework is a comprehensive solution that combines
 - **Email Handling**: aiosmtpd, smtplib
 - **Session Management**: aiohttp_session
 - **Environment Management**: python-dotenv
+- **Docker**: Containerization for deployment
 
 ## Setup and Installation
 
